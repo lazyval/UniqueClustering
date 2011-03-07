@@ -1,0 +1,21 @@
+<?xml version ="1.0"?>
+<project default="dist" name="UniqueClustering" basedir=".">
+	<description>A simple Java project that would detect non-unique entities in yandex.auto<description>
+	
+	<property name="src.dir" location="${basedir}/src"/>
+	
+
+	<!-- Assembling of application -->
+	<target name="build" depends="clean">
+		<mkdir dir="${basedir.classes}/"/>
+
+		<javac srcdir="${src.dir}/"
+			destdir="${basedir.classes}"
+			debug="false"
+			deprication="true"
+			optimize="true" >
+			<classpath refid="libs.dir">
+		</javac>
+
+	</target>
+</project>
