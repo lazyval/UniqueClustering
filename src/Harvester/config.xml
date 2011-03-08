@@ -30,4 +30,22 @@
         </loop>
     </var-def>
 
+    <var-def name="descriptionList">
+        <loop item="page">
+            <!--Iterate through all defined pages -->
+            <list>
+                <var name="pages"/>
+            </list>
+        <body>
+        	<!-- Result part is childless, have no parameters and it can't be <div>'s child -->
+            <xpath expression="//ul[not(parent::div)]/li[not(@*|*)]">
+                <html-to-xml>
+                    <!-- Each page from the list of predefined pages will be used to extract price using XPath -->
+                    <http url="${page}"/>
+                </html-to-xml>
+            </xpath>
+        </body>
+        </loop>
+    </var-def>
+
   </config>
