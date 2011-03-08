@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<config charset="UTF-8">
+
+    <var-def name="pages">
+    <!--We are going to take first 7 pages -->
+    <while condition="true" index="i" maxloops="7">
+        <var-def name="page${i}">
+        	<template>http://auto.yandex.ru/search.xml?text=bmw%205&amp;page_num=${i}</template>
+        </var-def>
+    </while>
+    </var-def>
+
+
+    <var-def name="priceList">
+        <loop item="page">
+            <!--Iterate through all defined pages -->
+            <list>
+                <var name="pages"/>
+            </list>
+        <body>
+        	<!-- not empty element and have no parameters -->
+            <xpath expression="//b[text()][not(@*)]">
+                <html-to-xml>
+                    <!-- Each page from the list of predefined pages will be used to extract price using XPath -->
+                    <http url="${page}"/>
+                </html-to-xml>
+            </xpath>
+        </body>
+        </loop>
+    </var-def>
+
+  </config>
