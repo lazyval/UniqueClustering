@@ -56,7 +56,7 @@
                 <var name="pages"/>
             </list>
         <body>
-        	<!-- We are examining string length to throw away text with 3 spaces-->
+        	<!-- We are examining string lenght to throw away text with 3 spaces-->
             <xpath expression="//li[@class='btm']/text()[normalize-space()][string-length()>3]">
                 <html-to-xml>
                     <!-- Each page from the list of predefined pages will be used to extract city and date using XPath -->
