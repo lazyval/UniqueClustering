@@ -39,7 +39,11 @@
             </list>
         <body>
         	<!-- Result part is childless, have no parameters and it can't be <div>'s child -->
+<<<<<<< HEAD
             <xpath expression="//ul[not(parent::div)]/li[not(@*|*)]/text()[normalize-space()]">
+=======
+            <xpath expression="//ul[not(parent::div)]/li[not(@*|*)]">
+>>>>>>> 866f72ea8a1e098dd23dc3eebc90ff5c4dd8d79e
                 <html-to-xml>
                     <!-- Each page from the list of predefined pages will be used to extract price using XPath -->
                     <http url="${page}"/>
@@ -49,6 +53,7 @@
         </loop>
     </var-def>
 
+<<<<<<< HEAD
     <var-def name="cityDateList">
         <loop item="page">
             <!--Iterate through all defined pages -->
@@ -105,4 +110,6 @@
     
     
 
+=======
+>>>>>>> 866f72ea8a1e098dd23dc3eebc90ff5c4dd8d79e
   </config>
