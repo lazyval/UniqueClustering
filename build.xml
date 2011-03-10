@@ -1,36 +1,39 @@
-<?xml version ="1.0"?>
-<project default="build" name="UniqueClustering" basedir=".">
-	<description>A simple Java project that would detect non-unique entities in yandex.auto<description>
-	
-	<property name="src.dir" location="${basedir}/src"/>
-
-    <!--Those properties would be used to create database file -->
-    <property name="sql.driver" value="com.mysql.jdbc.Driver"/>
-    <property name="sql.url" value="jdbc:mysql://127.0.0.1"/>
-    <property name="sql.user" value="johny"/>
-    <property name="sql.pass" value="johny"/>
+<?xml version="1.0"?>
+<project default="create_schema" name="database_init" basedir=".">
+    <description>Database initialization</description>
 
 
-	<!-- Assembling of application -->
-	<target name="build" depends="clean">
-		<mkdir dir="${basedir.classes}/"/>
+    <!--Database related properties -->
+    <property name="sql.db_name" value="mydatabase"/>
+    <!--Replace this values with your own, if you have one -->
+    <property name="sql.db_username" value="root"/>
+    <property name="sql.db_password" value="toor"/>
+    <property name="sql.queries_directory" value="${basedir}/sql_scripts"/>
 
-		<javac srcdir="${src.dir}/"
-			destdir="${basedir.classes}"
-			debug="false"
-			deprication="true"
-			optimize="true" >
-			<classpath refid="libs.dir">
-		</javac>
+    <target name="create_schema" depends="create_database">
+        <exec executable="mysql" input="${sql.queries_directory}/create_table.sql">
+            <arg value="${sql.db_name}" />
+            <arg value="-u${sql.db_username}" />
+            <arg value="-p${sql.db_password}" />
+        </exec>
+    </target>
+        <!--By this time it works only on linux-based OS (because of bash usage.
+        Should be fixed in future, with replacing executable to "mysql".
+        Also in TODOs - replace hardcoded SQL queries with an external sql files
+        placed in "sql_scripts" folder.    -->
+    <target name="create_database" depends="drop_database">
+        <exec executable="bash">
+            <arg value="-c"/>
+            <arg value="mysql --user=${sql.db_username} --password=${sql.db_password} --execute=&quot;CREATE DATABASE ${sql.db_name}&quot;"/>
+        </exec>
+    </target>
 
-	</target>
 
-  <target name="createTables">
-    <sql driver="${sql.driver}" url="${sql.url}" userid="${sql.user}"
-                                    password="${sql.pass}" >
-      <transaction src="client.sql"/>
-      <transaction src="project.sql"/>
-    </sql>
-  </target>
+    <target name="drop_database">
+        <exec executable="bash">
+            <arg value="-c"/>
+            <arg value="mysql --user=${sql.db_username} --password=${sql.db_password} --execute=&quot;DROP DATABASE ${sql.db_name}&quot;"/>
+        </exec>
+    </target>
 
 </project>
