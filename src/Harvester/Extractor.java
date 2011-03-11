@@ -50,11 +50,25 @@
         List<Integer> years = FilterYears(rawYears);
         List<String> cities = GetCities(rawCdates);
         List<int[]> dates = GetDates(rawCdates);     //[0] is Year;[1] is Month;[2] is Day
+        DatabaseAdapter db = new DatabaseAdapter();
+        for(int i = 0,j = 0; i < prices.size();i++,j+=2)
+        {
+            int price = prices.get(i);
+            String sDescription = rawDescriptions.get(j);
+            String lDescription = rawDescriptions.get(j+1);
+            String city = cities.get(i);
+            int year = years.get(i);
+            db.InsertRow(price,sDescription,lDescription,city,year);
+
+        }
+
         }
         catch (FileNotFoundException e)
         {
             System.out.println(e.getMessage());
         }
+
+
 
     }
 

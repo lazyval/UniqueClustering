@@ -7,34 +7,51 @@ package Harvester;
  * Time: 19:18
  */
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.Properties;
+
 import com.mysql.jdbc.Driver;
 
 
 public class DatabaseAdapter {
 
-    public static void main(String argv[]) {
+    private static String tablename="cars";
+    private static String url = "jdbc:mysql:///mydatabase";
+
+    public void InsertRow(int price, String shortDscrptn,String longDscrptn, String city,int productYear)
+    {
         Connection con = null;
         try{
-            //that database exists on every MySQL server
-            String url = "jdbc:mysql:///test";
             Class.forName("com.mysql.jdbc.Driver").newInstance();
-            con = DriverManager.getConnection(url, "root", "toor");
-            if(!con.isClosed())
-                System.out.println("Successfully connected");
+            Properties prop = new Properties();
+            prop.put("user","root");
+            prop.put("password","toor");
+            prop.put("characterEncoding","utf8");
+            con = DriverManager.getConnection(url, prop);
+
+            //if(!con.isClosed())
+                //System.out.println("Successfully connected");
+            String query="INSERT INTO " +tablename+ " VALUES ( 0 , ? , ? , ? , ? , ? );";
+            PreparedStatement st = con.prepareStatement(query);
+            st.setInt(1, price);
+            st.setString(2, "'" + shortDscrptn + "'");
+            st.setString(3,"'" + longDscrptn + "'");
+            st.setString(4,"'" + city + "'");
+            st.setInt(5, productYear);
+            System.out.println(st.toString());
+            st.executeUpdate();
+
+
         }
         catch (Exception e)
         {
             System.out.println(e.getMessage());
         }
-        try {
+        try
+        {
 		if(con != null)
 			con.close();
-	} catch(SQLException e) {}
-
-
-            }
-        }
+	    }
+        catch(SQLException e) {}
+    }
+}
