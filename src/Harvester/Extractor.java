@@ -164,9 +164,4 @@
                 result.add(wrappedObject.get(i).getWrappedObject().toString());
             return result;
         }
-
-
-        private static void processPrices(Object[] prices) {
-        }
-
     }
