@@ -12,6 +12,18 @@
         </while>
     </var-def>
 
+    <!--var-def name="extractedPages">
+        <loop item="page">
+        	<list>
+            <var name="pages"/>
+            </list>
+        <body>
+            <html-to-xml>
+                <http url="${page}"/>
+            </html-to-xml>
+        </body>
+        </loop>
+    </var-def-->
 
     <var-def name="priceList">
         <loop item="page">
@@ -24,6 +36,7 @@
                 <xpath expression="//b[text()][not(@*) and not(parent::p)]/text()[normalize-space()]">
                     <html-to-xml>
                         <!-- Each page from the list of predefined pages will be used to extract price using XPath -->
+                        <!--var name="page"/-->
                         <http url="${page}"/>
                     </html-to-xml>
                 </xpath>
@@ -92,7 +105,7 @@
                 <var name="pages"/>
             </list>
             <body>
-                <!-- We are examining string lenght to throw away text with 3 spaces-->
+                <!-- We are examining string length to throw away text with 3 spaces-->
                 <xpath expression="//h4/*/text()[normalize-space()]">
                     <html-to-xml>
                         <!-- Each page from the list of predefined pages will be used to extract city and date using XPath -->
