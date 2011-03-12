@@ -8,7 +8,7 @@
     <!--Replace this values with your own, if you have one -->
     <property name="sql.db_username" value="root"/>
     <property name="sql.db_password" value="toor"/>
-    <property name="sql.queries_directory" value="${basedir}/sql_scripts"/>
+    <property name="sql.queries_directory" value="${basedir}/sql"/>
 
     <target name="create_schema" depends="create_database">
         <exec executable="mysql" input="${sql.queries_directory}/create_table.sql">
