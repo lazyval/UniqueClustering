@@ -1,14 +1,45 @@
 <?xml version="1.0"?>
-<project default="create_schema" name="database_init" basedir=".">
+<project default="build" name="database_init" basedir=".">
     <description>Database initialization</description>
 
+    <target name="init">
+        <property file="build.properties"/>
+        <property name="base.dir" location="${project.dir}/build"/>
+        <property name="src.dir" location="${project.dir}/src"/>
 
-    <!--Database related properties -->
-    <property name="sql.db_name" value="mydatabase"/>
-    <!--Replace this values with your own, if you have one -->
-    <property name="sql.db_username" value="root"/>
-    <property name="sql.db_password" value="toor"/>
-    <property name="sql.queries_directory" value="${basedir}/sql"/>
+        <!-- Destination dirs-->
+        <property name="src.java.dir" location="${src.dir}/java"/>
+        <property name="build.dir" location="${project.dir}/build"/>
+        <property name="build.classes.dir" location="${build.dir}/classes"/>
+        <property name="build.lib.dir" location="${build.dir}/lib"/>
+        <property name="dist.dir" location="${build.dir}/dist"/>
+
+        <property name="main-class" value="Harvester.Extractor"/>
+
+        <property name="javac.debug" value="on"/>
+        <property name="javac.debuglevel" value="lines"/>
+
+        <fileset id="project-config" dir="${project.dir}">
+            <include name="*.xml"/>
+            <exclude name="build.xml"/>
+        </fileset>
+
+        <fileset id="project-lib" dir="${project.dir}/lib">
+            <include name="**/*.jar"/>
+            <!--exclude name="junit*.jar"/-->
+        </fileset>
+
+        <path id="project.classpath">
+            <fileset refid="project-lib"/>
+        </path>
+
+        <!--Database related properties -->
+        <property name="sql.db_name" value="mydatabase"/>
+        <!--Replace this values with your own, if you have one -->
+        <property name="sql.db_username" value="root"/>
+        <property name="sql.db_password" value="toor"/>
+        <property name="sql.queries_directory" value="${basedir}/sql"/>
+    </target>
 
     <target name="create_schema" depends="create_database">
         <exec executable="mysql" input="${sql.queries_directory}/create_table.sql">
@@ -19,7 +50,7 @@
     </target>
         <!--By this time it works only on linux-based OS (because of bash usage.
         Should be fixed in future, with replacing executable to "mysql".
-        Also in TODOs - replace hardcoded SQL queries with an external sql files
+        Also in TODO - replace hardcoded SQL queries with an external sql files
         placed in "sql_scripts" folder.    -->
     <target name="create_database" depends="drop_database">
         <exec executable="bash">
@@ -29,11 +60,48 @@
     </target>
 
 
-    <target name="drop_database">
+    <target name="drop_database" depends="init">
         <exec executable="bash">
             <arg value="-c"/>
             <arg value="mysql --user=${sql.db_username} --password=${sql.db_password} --execute=&quot;DROP DATABASE ${sql.db_name}&quot;"/>
         </exec>
+    </target>
+
+    <target name="build" depends="init,make-jar,create_schema"/>
+
+    <target name="compile" depends="init,clean,copy-lib">
+        <mkdir dir="${build.classes.dir}"/>
+        <javac srcdir="${src.dir}"
+               destdir="${build.classes.dir}"
+               classpathref="project.classpath"
+               debug="${javac.debug}"
+               debuglevel="${javac.debuglevel}"
+        />
+    </target>
+
+    <target name="copy-lib" depends="init">
+        <copy todir="${build.lib.dir}" flatten="true">
+            <fileset refid="project-lib"/>
+            <fileset refid="project-config"/>
+            <!-- TODO include another fileset: scripts
+            (first of all, harvester config) and place them to lib dir -->
+        </copy>
+    </target>
+
+
+    <target name="make-jar" depends="compile">
+        <jar destfile="${build.lib.dir}/unique-clustering.jar" basedir="${build.classes.dir}" includes="**/*.class | */.jar">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+                <attribute name="Class-Path"
+                           value="mysql-connector-java-5.1.15-bin.jar webharvest_all_2.jar ."/>
+                <!--TODO make not hardcoded set of files -->
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="clean" depends="init">
+        <delete dir="${build.dir}" failonerror="false"/>
     </target>
 
 </project>

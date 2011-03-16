@@ -22,6 +22,7 @@ public class HierarchicalClustering implements ClusteringAlgorithm {
     public HierarchicalClustering(List<CarEntity> cars) {
         for(CarEntity c : cars)
             carList.add(new SplittedCarEntity(c));
+        //TODO make dictionary: replace all strings with int number (it will speed up comparing while clustering)
     }
 
     public List<Integer> process() {
@@ -97,11 +98,11 @@ public class HierarchicalClustering implements ClusteringAlgorithm {
     private int distCars(SplittedCarEntity firstCar, SplittedCarEntity secondCar) {
         //Key features: price, type, color,
         int distance = 0;
-        int lenght = Math.min(firstCar.getShortDesc().length,
+        int length = Math.min(firstCar.getShortDesc().length,
                               secondCar.getShortDesc().length);
         try
         {
-            for(int k=0; k < lenght;k++)
+            for(int k=0; k < length;k++)
                 if(firstCar.getShortDesc()[k].equals(secondCar.getShortDesc()[k]))
                     distance+= keyDescWeight;
             if(firstCar.getCity().equals(secondCar.getCity()))

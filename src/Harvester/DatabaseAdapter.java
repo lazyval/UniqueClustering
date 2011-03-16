@@ -7,10 +7,11 @@ package Harvester;
  * Time: 19:18
  */
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Properties;
-
-import com.mysql.jdbc.Driver;
 
 
 public class DatabaseAdapter {
@@ -18,7 +19,7 @@ public class DatabaseAdapter {
     private static String tablename="cars";
     private static String url = "jdbc:mysql:///mydatabase";
 
-    public void InsertRow(int price, String shortDscrptn,String longDscrptn, String city,int productYear)
+    public void InsertRow(int price, String shortDscrptn, String longDscrptn, String city, int productYear, int cluster)
     {
         Connection con = null;
         try{
@@ -29,15 +30,14 @@ public class DatabaseAdapter {
             prop.put("characterEncoding","utf8");
             con = DriverManager.getConnection(url, prop);
 
-            //if(!con.isClosed())
-                //System.out.println("Successfully connected");
-            String query="INSERT INTO " +tablename+ " VALUES ( 0 , ? , ? , ? , ? , ? );";
+            String query="INSERT INTO " +tablename+ " VALUES ( 0 , ? , ? , ? , ? , ?, ? );";
             PreparedStatement st = con.prepareStatement(query);
             st.setInt(1, price);
-            st.setString(2, "'" + shortDscrptn + "'");
-            st.setString(3,"'" + longDscrptn + "'");
-            st.setString(4,"'" + city + "'");
+            st.setString(2,shortDscrptn);
+            st.setString(3,longDscrptn);
+            st.setString(4,city);
             st.setInt(5, productYear);
+            st.setInt(6,cluster);
             System.out.println(st.toString());
             st.executeUpdate();
 

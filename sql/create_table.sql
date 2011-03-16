@@ -4,7 +4,8 @@ CREATE TABLE cars (
          short_descrpt VARCHAR(1000),
          long_descrpt VARCHAR(2048),
          city VARCHAR(30),
-         product_year INT
+         product_year INT,
+         cluster INT
        ) CHARACTER SET utf8;
 
 
