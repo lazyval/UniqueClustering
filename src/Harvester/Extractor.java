@@ -1,12 +1,16 @@
     package Harvester;
 
+    import Clustering.HierarchicalClustering;
     import org.webharvest.definition.ScraperConfiguration;
     import org.webharvest.runtime.Scraper;
     import org.webharvest.runtime.variables.NodeVariable;
     import org.webharvest.runtime.variables.Variable;
 
     import java.io.FileNotFoundException;
-    import java.util.*;
+    import java.util.ArrayList;
+    import java.util.Calendar;
+    import java.util.List;
+
 
     /**
      * Created by IntelliJ IDEA.
@@ -21,6 +25,8 @@
     //Output: populated MySQL database file with parsed entities
 
     public class Extractor {
+
+
         enum Months {
             января(1),февраля(2), марта (3), апреля (4), мая (5), июня (6),
             июля (7), августа(8),сентября(9), октября(10), ноября(11),декабря(12);
@@ -30,46 +36,54 @@
             }
         };
 
-
         public static void main(String[] args) {
-
+        List<CarEntity> cars = new ArrayList();
         try{
-        String curDir = System.getProperty("user.dir");
-        ScraperConfiguration config = new ScraperConfiguration(curDir + "/src/Harvester/config.xml");
-        Scraper scraper = new Scraper(config, curDir);
+            String curDir = System.getProperty("user.dir");
+            //ScraperConfiguration config = new ScraperConfiguration(curDir + "/src/Harvester/config.xml");
+            ScraperConfiguration config = new ScraperConfiguration(curDir + "/config.xml");
+            Scraper scraper = new Scraper(config, curDir);
 
-        scraper.setDebug(true);
-        scraper.execute();
-        //Unwrapping all variables that scraper constructed after execution
-        List<String> rawYears = UnwrapToList((List<NodeVariable>) ((Variable) scraper.getContext().get("yearList")).getWrappedObject());
-        List<String> rawPrices = UnwrapToList((List<NodeVariable>) ((Variable) scraper.getContext().get("priceList")).getWrappedObject());
-        List<String> rawDescriptions = UnwrapToList((List<NodeVariable>) ((Variable) scraper.getContext().get("descriptionList")).getWrappedObject());
-        List<String> rawCdates = UnwrapToList((List<NodeVariable>) ((Variable) scraper.getContext().get("cityDateList")).getWrappedObject());
+            scraper.setDebug(true);
+            scraper.execute();
+            //Unwrapping all variables that scraper constructed after execution
+            List<String> rawYears = UnwrapToList((List<NodeVariable>) ((Variable) scraper.getContext().get("yearList")).getWrappedObject());
+            List<String> rawPrices = UnwrapToList((List<NodeVariable>) ((Variable) scraper.getContext().get("priceList")).getWrappedObject());
+            List<String> rawDescriptions = UnwrapToList((List<NodeVariable>) ((Variable) scraper.getContext().get("descriptionList")).getWrappedObject());
+            List<String> rawCdates = UnwrapToList((List<NodeVariable>) ((Variable) scraper.getContext().get("cityDateList")).getWrappedObject());
 
-        List<Integer> prices = FilterPrices(rawPrices);
-        List<Integer> years = FilterYears(rawYears);
-        List<String> cities = GetCities(rawCdates);
-        List<int[]> dates = GetDates(rawCdates);     //[0] is Year;[1] is Month;[2] is Day
-        DatabaseAdapter db = new DatabaseAdapter();
-        for(int i = 0,j = 0; i < prices.size();i++,j+=2)
-        {
-            int price = prices.get(i);
-            String sDescription = rawDescriptions.get(j);
-            String lDescription = rawDescriptions.get(j+1);
-            String city = cities.get(i);
-            int year = years.get(i);
-            db.InsertRow(price,sDescription,lDescription,city,year);
-
-        }
-
+            List<Integer> prices = FilterPrices(rawPrices);
+            List<Integer> years = FilterYears(rawYears);
+            List<String> cities = GetCities(rawCdates);
+            List<int[]> dates = GetDates(rawCdates);     //[0] is Year;[1] is Month;[2] is Day
+            for(int i = 0,j = 0; i < prices.size();i++,j+=2)
+            {
+                int price = prices.get(i);
+                String sDescription = rawDescriptions.get(j);
+                String lDescription = rawDescriptions.get(j+1);
+                String city = cities.get(i);
+                int year = years.get(i);
+                cars.add(new CarEntity(price,sDescription,lDescription,city,year,0));
+            }
         }
         catch (FileNotFoundException e)
         {
             System.out.println(e.getMessage());
         }
-
-
-
+        HierarchicalClustering processor = new HierarchicalClustering(cars);
+        List<Integer> indices = processor.process();
+        DatabaseAdapter db = new DatabaseAdapter();
+        for(int i=0;i<cars.size();i++) {
+            if(indices.get(i)<0)
+                indices.set(i,i);
+            db.InsertRow(cars.get(i).getPrice(),
+                        cars.get(i).getShortDesc(),
+                        cars.get(i).getLongDesc(),
+                        cars.get(i).getCity(),
+                        cars.get(i).getYear(),
+                        indices.get(i));
+            //TODO make bath insert
+        }
     }
 
         private static List<String> GetCities(List<String> rawCdates) {
