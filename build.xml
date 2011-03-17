@@ -6,25 +6,30 @@
         <property file="build.properties"/>
         <property name="base.dir" location="${project.dir}/build"/>
         <property name="src.dir" location="${project.dir}/src"/>
+        <property name="src.java.dir" location="${src.dir}/java"/>
+        <property name="src.lib" location="${project.dir}/lib"/>
 
         <!-- Destination dirs-->
-        <property name="src.java.dir" location="${src.dir}/java"/>
         <property name="build.dir" location="${project.dir}/build"/>
         <property name="build.classes.dir" location="${build.dir}/classes"/>
         <property name="build.lib.dir" location="${build.dir}/lib"/>
-        <property name="dist.dir" location="${build.dir}/dist"/>
+
+
 
         <property name="main-class" value="Harvester.Extractor"/>
 
+
+
         <property name="javac.debug" value="on"/>
         <property name="javac.debuglevel" value="lines"/>
+
 
         <fileset id="project-config" dir="${project.dir}">
             <include name="*.xml"/>
             <exclude name="build.xml"/>
         </fileset>
 
-        <fileset id="project-lib" dir="${project.dir}/lib">
+        <fileset id="project-lib" dir="${src.lib}">
             <include name="**/*.jar"/>
             <!--exclude name="junit*.jar"/-->
         </fileset>
@@ -67,7 +72,7 @@
         </exec>
     </target>
 
-    <target name="build" depends="init,make-jar,create_schema"/>
+    <target name="build" depends="init,make-jar,create_schema,database_filling"/>
 
     <target name="compile" depends="init,clean,copy-lib">
         <mkdir dir="${build.classes.dir}"/>
@@ -103,5 +108,15 @@
     <target name="clean" depends="init">
         <delete dir="${build.dir}" failonerror="false"/>
     </target>
+
+    <target name="database_filling" depends="make-jar">
+       <java
+           fork="true"
+           dir="${build.lib.dir}"
+           jar="${build.lib.dir}/unique-clustering.jar"
+           failonerror="true"
+           />
+    </target>
+
 
 </project>
