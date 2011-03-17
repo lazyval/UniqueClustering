@@ -4,7 +4,7 @@
 
     <var-def name="pages">
         <!--We are going to take first 7 pages -->
-        <while condition="true" index="i" maxloops="4">
+        <while condition="true" index="i" maxloops="7">
             <var-def name="page${i}">
                 <!--That is an initial search query -->
                 <template>http://auto.yandex.ru/search.xml?text=bmw%205&amp;page_num=${i}</template>
@@ -12,7 +12,7 @@
         </while>
     </var-def>
 
-    <!--var-def name="extractedPages">
+    <var-def name="extractedPages">
         <loop item="page">
         	<list>
             <var name="pages"/>
@@ -23,22 +23,18 @@
             </html-to-xml>
         </body>
         </loop>
-    </var-def-->
+    </var-def>
 
     <var-def name="priceList">
         <loop item="page">
             <!--Iterate through all defined pages -->
             <list>
-                <var name="pages"/>
+                <var name="extractedPages"/>
             </list>
             <body>
                 <!-- not empty element and have no parameters (p could be a parent - that's because of "info block" on firts page -->
                 <xpath expression="//b[text()][not(@*) and not(parent::p)]/text()[normalize-space()]">
-                    <html-to-xml>
-                        <!-- Each page from the list of predefined pages will be used to extract price using XPath -->
-                        <!--var name="page"/-->
-                        <http url="${page}"/>
-                    </html-to-xml>
+                     <template>${page}</template>
                 </xpath>
             </body>
         </loop>
@@ -48,15 +44,12 @@
         <loop item="page">
             <!--Iterate through all defined pages -->
             <list>
-                <var name="pages"/>
+                <var name="extractedPages"/>
             </list>
             <body>
                 <!-- Result part is childless, have no parameters and it can't be <div>'s child -->
                 <xpath expression="//ul[not(parent::div)]/li[not(@*|*)]/text()[normalize-space()]">
-                    <html-to-xml>
-                        <!-- Each page from the list of predefined pages will be used to extract price using XPath -->
-                        <http url="${page}"/>
-                    </html-to-xml>
+                    <template>${page}</template>
                 </xpath>
             </body>
         </loop>
@@ -66,15 +59,12 @@
         <loop item="page">
             <!--Iterate through all defined pages -->
             <list>
-                <var name="pages"/>
+                <var name="extractedPages"/>
             </list>
             <body>
                 <!-- We are examining string lenght to throw away text with 3 spaces-->
                 <xpath expression="//li[@class='btm']/text()[normalize-space()][string-length()>3]">
-                    <html-to-xml>
-                        <!-- Each page from the list of predefined pages will be used to extract city and date using XPath -->
-                        <http url="${page}"/>
-                    </html-to-xml>
+                    <template>${page}</template>
                 </xpath>
             </body>
         </loop>
@@ -84,15 +74,12 @@
         <loop item="page">
             <!--Iterate through all defined pages -->
             <list>
-                <var name="pages"/>
+                <var name="extractedPages"/>
             </list>
             <body>
-                <!-- We are examining string lenght to throw away text with 3 spaces-->
+                <!-- We are examining string length to throw away text with 3 spaces-->
                 <xpath expression="//span[@class='year']/text()[normalize-space()]">
-                    <html-to-xml>
-                        <!-- Each page from the list of predefined pages will be used to extract city and date using XPath -->
-                        <http url="${page}"/>
-                    </html-to-xml>
+                    <template>${page}</template>
                 </xpath>
             </body>
         </loop>
@@ -102,15 +89,12 @@
         <loop item="page">
             <!--Iterate through all defined pages -->
             <list>
-                <var name="pages"/>
+                <var name="extractedPages"/>
             </list>
             <body>
                 <!-- We are examining string length to throw away text with 3 spaces-->
                 <xpath expression="//h4/*/text()[normalize-space()]">
-                    <html-to-xml>
-                        <!-- Each page from the list of predefined pages will be used to extract city and date using XPath -->
-                        <http url="${page}"/>
-                    </html-to-xml>
+                    <template>${page}</template>
                 </xpath>
             </body>
         </loop>
